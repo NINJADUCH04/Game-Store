@@ -251,7 +251,7 @@ Full interactive documentation with request/response schemas is available at:
 **Products**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/products` | List products (paginated, filterable by `location=JO\|SA`) |
+| GET | `/api/products` | List products (paginated) |
 | GET | `/api/products/{id}` | Get product details |
 
 **Orders**
@@ -264,6 +264,18 @@ Full interactive documentation with request/response schemas is available at:
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/health` | Health check |
+
+### Query Parameters
+
+**`GET /api/products`**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `page` | int | 1 | Page number |
+| `page_size` | int | 10 | Items per page (max 100) |
+| `location` | string | — | Filter by region: `JO` or `SA` |
+
+Example: `GET /api/products?page=1&page_size=5&location=JO`
 
 All protected endpoints (Products, Orders) require the `Authorization: Bearer <token>` header.
 
