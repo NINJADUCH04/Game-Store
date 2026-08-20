@@ -1,13 +1,13 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import datetime
-from uuid import UUID
 
-# --- Auth Schemas ---
+
 class UserCreate(BaseModel):
     username: str
-    email: str
+    email: EmailStr
     password: str
+
 
 class UserResponse(BaseModel):
     id: int
@@ -27,7 +27,6 @@ class TokenData(BaseModel):
     username: Optional[str] = None
 
 
-# --- Product Schemas ---
 class ProductResponse(BaseModel):
     id: int
     title: str
@@ -39,22 +38,19 @@ class ProductResponse(BaseModel):
 
 
 class PaginatedProductsResponse(BaseModel):
-    items: List[ProductResponse]
+    items: list[ProductResponse]
     total: int
     page: int
     page_size: int
     total_pages: int
 
 
-# --- Order Schemas ---
 class OrderCreate(BaseModel):
     product_id: int
 
 
-
-
 class OrderResponse(BaseModel):
-    id: UUID | str
+    id: int
     user_id: int
     product_id: int
     product_title: str
@@ -62,7 +58,4 @@ class OrderResponse(BaseModel):
     unit_price: float
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)  # Pydantic v2
-    # If using Pydantic v1:
-    # class Config:
-    #     orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

@@ -1,32 +1,37 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# 1. Import routers
-from app.routers import auth, products, orders  # Ensure filenames match app/routers/
+from app.core.config import settings
+from app.routers import auth, products, orders
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+
 
 app = FastAPI(
     title="Digital Game Store API",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan,
 )
- 
-# 2. Add CORS Middleware (Essential for Next.js)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 3. Include Routers explicitly
 app.include_router(auth.router)
 app.include_router(products.router)
 app.include_router(orders.router)
 
-# 4. Debug helper to print loaded routes
-@app.on_event("startup")
-def print_routes():
-    for route in app.routes:
-        if hasattr(route, "methods"):
-            print(f"REGISTERED ROUTE: {route.path} [{','.join(route.methods)}]")
+
+@app.get("/health", tags=["Health"])
+def health_check() -> dict:
+    return {"status": "healthy"}
