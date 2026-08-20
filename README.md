@@ -1,10 +1,8 @@
-# Digital Game Store - Architecture Overview
+# Digital Game Store
 
 A full-stack web application for browsing and purchasing digital games with location-based inventory.
 
 ## Architecture
-
-### System Overview
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -24,15 +22,13 @@ A full-stack web application for browsing and purchasing digital games with loca
 | Backend | FastAPI, Python | REST API framework |
 | ORM | SQLAlchemy 2.0 | Database abstraction |
 | Database | PostgreSQL 15+ | Persistent storage |
-| Authentication | JWT (python-jose) | Token-based auth |
+| Auth | JWT (python-jose) | Token-based auth |
+| Migrations | Alembic | Schema versioning |
+| Testing | pytest, httpx | Unit/integration tests |
 
-## Database
+## Why PostgreSQL
 
-### PostgreSQL
-
-Why PostgreSQL?
-
-I chose PostgreSQL for this project because it’s exceptionally reliable, easy to set up, and scales effortlessly as the platform grows. For a digital game store, data consistency is non-negotiable—orders require strict ACID compliance, foreign key constraints, and accurate price snapshots, all of which PostgreSQL handles out of the box. It offers native UUID support, flexible JSON handling for game metadata, and seamless integration with Python and SQLAlchemy. It is production-ready, widely adopted, and the clear best choice for transactional systems.
+I chose PostgreSQL for this project because it's exceptionally reliable, easy to set up, and scales effortlessly as the platform grows. For a digital game store, data consistency is non-negotiable—orders require strict ACID compliance, foreign key constraints, and accurate price snapshots, all of which PostgreSQL handles out of the box. It offers native UUID support, flexible JSON handling for game metadata, and seamless integration with Python and SQLAlchemy. It is production-ready, widely adopted, and the clear best choice for transactional systems.
 
 SQLite is supported only as a convenience fallback when DATABASE_URL is not configured, mainly for quick local testing. PostgreSQL should be used for normal development and evaluation.
 
@@ -46,134 +42,98 @@ SQLite is supported only as a convenience fallback when DATABASE_URL is not conf
 
 5. **Production Readiness** - Battle-tested in e-commerce (Shopify, Spotify). Supports replication, point-in-time recovery, and high availability.
 
-### Database Schema
-
-```sql
--- Users table
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR UNIQUE NOT NULL,
-    email VARCHAR UNIQUE NOT NULL,
-    hashed_password VARCHAR NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Products table
-CREATE TABLE products (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR NOT NULL,
-    description VARCHAR,
-    price FLOAT NOT NULL,
-    location VARCHAR NOT NULL,  -- 'JO' or 'SA'
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Orders table
-CREATE TABLE orders (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    product_id INTEGER REFERENCES products(id),
-    product_title VARCHAR NOT NULL,
-    buyer_username VARCHAR NOT NULL,
-    unit_price FLOAT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-## Backend
-
-### Project Structure
+## Backend Structure
 
 ```
 backend/
 ├── app/
-│   ├── __init__.py
-│   ├── main.py           # FastAPI app, CORS, routers
-│   ├── config.py          # Environment settings
-│   ├── database.py        # SQLAlchemy engine/session
-│   ├── models.py          # ORM models (User, Product, Order)
-│   ├── schemas.py         # Pydantic request/response schemas
-│   ├── auth.py            # JWT, password hashing
-│   └── routers/
-│       ├── __init__.py
-│       ├── auth.py        # POST /api/auth/register, /api/auth/login
-│       ├── products.py    # GET /api/products
-│       └── orders.py      # POST /api/orders, GET /api/orders/{id}
-├── scripts/
-│   └── import_csv.py      # Data seeding utility
-├── data.csv               # Product data
-├── requirements.txt       # Python dependencies
-└── .env.example           # Environment template
+│   ├── core/
+│   │   ├── auth.py          # JWT, password hashing
+│   │   ├── config.py        # Pydantic BaseSettings
+│   │   ├── database.py      # SQLAlchemy engine/session
+│   │   ├── models.py        # ORM models
+│   │   └── schemas.py       # Pydantic schemas
+│   ├── routers/
+│   │   ├── auth.py          # /api/auth/*
+│   │   ├── products.py      # /api/products/*
+│   │   └── orders.py        # /api/orders/*
+│   ├── services/
+│   │   ├── auth_service.py  # Auth business logic
+│   │   ├── product_service.py
+│   │   └── order_service.py
+│   └── main.py              # FastAPI app entry
+├── alembic/                 # Database migrations
+├── tests/                   # pytest test suite
+├── data/data.csv            # Seed data
+├── scripts/import_csv.py    # Data import utility
+├── requirements.txt
+├── requirements-test.txt
+└── .env.example
 ```
 
 ### API Endpoints
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
+| GET | `/health` | No | Health check |
 | POST | `/api/auth/register` | No | Create user account |
 | POST | `/api/auth/login` | No | Get JWT token |
-| GET | `/api/products` | Yes | List products (paginated, filterable by location) |
+| GET | `/api/products` | Yes | List products (paginated, filterable) |
 | GET | `/api/products/{id}` | Yes | Get product details |
 | POST | `/api/orders` | Yes | Create order |
 | GET | `/api/orders/{id}` | Yes | Get order details |
 
-### Authentication Flow
+### Authentication
 
+```bash
+# Register
+curl -X POST http://localhost:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username": "user1", "email": "user1@example.com", "password": "pass123"}'
+
+# Login
+curl -X POST http://localhost:8000/api/auth/login \
+  -d "username=user1&password=pass123"
+
+# Use token for protected routes
+curl http://localhost:8000/api/products \
+  -H "Authorization: Bearer <token>"
 ```
-1. Register → POST /api/auth/register
-   Body: { username, email, password }
-   Returns: { id, username, email, created_at }
 
-2. Login → POST /api/auth/login
-   Body: { username, password } (form-urlencoded)
-   Returns: { access_token, token_type }
-
-3. Protected Requests
-   Header: Authorization: Bearer <token>
-```
-
-## Frontend
-
-### Project Structure
+## Frontend Structure
 
 ```
 frontend/
 ├── src/
-│   ├── app/                    # Next.js App Router pages
-│   │   ├── layout.tsx          # Root layout with AuthProvider
-│   │   ├── page.tsx            # Redirects to /products
-│   │   ├── login/page.tsx      # Login form
-│   │   ├── register/page.tsx   # Registration form
-│   │   ├── products/
-│   │   │   ├── page.tsx        # Product listing
-│   │   │   └── [id]/page.tsx   # Product details
-│   │   └── receipt/
-│   │       └── [id]/page.tsx   # Order receipt
-│   ├── components/
-│   │   └── Navbar.tsx          # Navigation bar
-│   ├── context/
-│   │   └── AuthContext.tsx     # Auth state management
-│   └── services/
-│       └── api.ts              # Axios instance with interceptors
-├── package.json
-├── next.config.ts
-└── tsconfig.json
+│   ├── app/                  # Next.js App Router pages
+│   │   ├── login/            # Login page
+│   │   ├── register/         # Registration page
+│   │   ├── products/         # Product listing + detail
+│   │   └── receipt/          # Order receipt
+│   ├── components/           # Reusable UI components
+│   ├── context/              # AuthContext (state management)
+│   └── services/             # API client (Axios)
+└── package.json
 ```
-
-### Key Features
-
-- **Server-Side Rendering** - Initial page loads via Next.js SSR
-- **Protected Routes** - Client-side auth checks via AuthContext
-- **JWT Persistence** - Token stored in localStorage
-- **API Interceptor** - Automatic Bearer token injection via Axios
 
 ## Security
 
-- **Password Hashing** - bcrypt via pwdlib
-- **JWT Tokens** - HS256 signing with configurable expiry (24h default)
-- **CORS** - Restricted to `http://localhost:3000`
-- **SQL Injection Prevention** - SQLAlchemy ORM parameterized queries
-- **Input Validation** - Pydantic schemas enforce types
+- **Password Hashing** — bcrypt via pwdlib
+- **JWT Tokens** — HS256 with 24h expiry
+- **CORS** — Configurable allowed origins
+- **SQL Injection** — SQLAlchemy ORM parameterized queries
+- **Input Validation** — Pydantic schemas enforce types at runtime
+
+## Testing
+
+```bash
+cd backend
+pip install -r requirements-test.txt
+pytest                    # Run all tests + coverage
+pytest tests/test_auth.py # Run specific module
+```
+
+**Coverage: 97%** — 30 tests across auth, products, orders, and health.
 
 ## Getting Started
 
@@ -198,7 +158,8 @@ cd backend
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env  # Configure DATABASE_URL
+cp .env.example .env
+alembic upgrade head
 python scripts/import_csv.py
 uvicorn app.main:app --reload --port 8000
 ```
@@ -217,4 +178,5 @@ npm run dev
 |----------|---------|-------------|
 | `DATABASE_URL` | `postgresql://store_user:securepassword@localhost:5432/game_store` | PostgreSQL connection string |
 | `SECRET_KEY` | `super-secret-jwt-key-change-in-production` | JWT signing key |
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend API URL |
+| `CORS_ORIGINS` | `["http://localhost:3000"]` | Allowed CORS origins |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend API URL (frontend) |
