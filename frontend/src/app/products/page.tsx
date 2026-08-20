@@ -17,6 +17,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [location, setLocation] = useState<string>('');
   
   // Pagination States
   const [page, setPage] = useState(1);
@@ -27,7 +28,10 @@ export default function ProductsPage() {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const res = await api.get(`/api/products?page=${page}&page_size=${pageSize}`);
+        let url = `/api/products?page=${page}&page_size=${pageSize}`;
+        if (location) url += `&location=${location}`;
+        
+        const res = await api.get(url);
         
         if (res.data.items) {
           setProducts(res.data.items);
@@ -43,12 +47,16 @@ export default function ProductsPage() {
       }
     };
     fetchProducts();
-  }, [page]);
+  }, [page, location]);
 
   const filteredProducts = products.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.location.toLowerCase().includes(search.toLowerCase())
+    p.title.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleLocationChange = (value: string) => {
+    setLocation(value);
+    setPage(1);
+  };
 
   return (
     <div className="min-h-screen bg-[#0c0f1d] text-slate-100 flex flex-col">
@@ -70,11 +78,45 @@ export default function ProductsPage() {
           <div className="relative z-10 w-full md:w-72">
             <input
               type="text"
-              placeholder="Search page items..."
+              placeholder="Search by title..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-slate-950 border border-cyan-500/30 text-white placeholder-slate-500 px-4 py-2.5 rounded-xl outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition text-sm"
             />
+          </div>
+
+          {/* Location Filter */}
+          <div className="relative z-10 flex gap-2">
+            <button
+              onClick={() => handleLocationChange('')}
+              className={`font-orbitron text-xs font-bold px-4 py-2 rounded-xl transition uppercase tracking-wider cursor-pointer ${
+                location === ''
+                  ? 'bg-cyan-600 text-white border border-cyan-500'
+                  : 'bg-slate-950 text-slate-400 border border-slate-700 hover:border-cyan-500/50'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => handleLocationChange('JO')}
+              className={`font-orbitron text-xs font-bold px-4 py-2 rounded-xl transition uppercase tracking-wider cursor-pointer ${
+                location === 'JO'
+                  ? 'bg-cyan-600 text-white border border-cyan-500'
+                  : 'bg-slate-950 text-slate-400 border border-slate-700 hover:border-cyan-500/50'
+              }`}
+            >
+              JO
+            </button>
+            <button
+              onClick={() => handleLocationChange('SA')}
+              className={`font-orbitron text-xs font-bold px-4 py-2 rounded-xl transition uppercase tracking-wider cursor-pointer ${
+                location === 'SA'
+                  ? 'bg-cyan-600 text-white border border-cyan-500'
+                  : 'bg-slate-950 text-slate-400 border border-slate-700 hover:border-cyan-500/50'
+              }`}
+            >
+              SA
+            </button>
           </div>
 
           <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
