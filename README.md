@@ -242,17 +242,30 @@ Full interactive documentation with request/response schemas is available at:
 
 ### Endpoints
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/health` | No | Health check |
-| POST | `/api/auth/register` | No | Create user account |
-| POST | `/api/auth/login` | No | Get JWT token |
-| GET | `/api/products` | Yes | List products (paginated, filterable by `location=JO\|SA`) |
-| GET | `/api/products/{id}` | Yes | Get product details |
-| POST | `/api/orders` | Yes | Create order |
-| GET | `/api/orders/{id}` | Yes | Get order (own orders only) |
+**Authentication**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Create user account |
+| POST | `/api/auth/login` | Get JWT token |
 
-All protected endpoints require the `Authorization: Bearer <token>` header.
+**Products**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/products` | List products (paginated, filterable by `location=JO\|SA`) |
+| GET | `/api/products/{id}` | Get product details |
+
+**Orders**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/orders` | Create order |
+| GET | `/api/orders/{id}` | Get order (own orders only) |
+
+**System**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+
+All protected endpoints (Products, Orders) require the `Authorization: Bearer <token>` header.
 
 ---
 
