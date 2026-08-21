@@ -59,18 +59,7 @@ fs-sde-assignment/
 │   │   └── main.py              # FastAPI app, CORS, routers, health check
 │   ├── alembic/                 # Database migration scripts
 │   ├── tests/
-│   │   ├── conftest.py          # Fixtures: test client, DB, auth, data
-│   │   ├── test_auth.py         # 11 tests: register, login, token
-│   │   ├── test_products.py     # 9 tests: list, get, filter, pagination
-│   │   ├── test_orders.py       # 8 tests: create, get, auth, ownership
-│   │   └── test_health.py       # 1 test: health endpoint
-│   ├── data/data.csv            # 100 product records (seed data)
-│   ├── scripts/import_csv.py    # CSV → PostgreSQL import utility
-│   ├── requirements.txt         # Production dependencies
-│   ├── requirements-test.txt    # Test dependencies
-│   ├── pytest.ini               # pytest configuration
-│   ├── alembic.ini              # Alembic configuration
-│   └── .env.example             # Environment variable template
+│  
 ├── frontend/
 │   ├── src/
 │   │   ├── app/
@@ -89,6 +78,8 @@ fs-sde-assignment/
 │   ├── package.json
 │   └── tsconfig.json
 └── README.md
+└── docker-compose.yml
+
 ```
 
 ---
