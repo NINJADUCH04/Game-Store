@@ -18,12 +18,8 @@ A full-stack web application for browsing and purchasing digital games with loca
 |-------|-----------|---------|
 | Frontend | Next.js 16, React 19, TypeScript | SSR/SSG React framework |
 | Styling | Tailwind CSS 4 | Utility-first CSS |
-| HTTP Client | Axios | API communication with interceptors |
 | Backend | FastAPI, Python 3.12 | Async REST API framework |
-| ORM | SQLAlchemy 2.0 | Database abstraction |
 | Database | PostgreSQL 15+ | Persistent storage with ACID |
-| Auth | JWT (python-jose) + pwdlib (bcrypt) | Token-based authentication |
-| Migrations | Alembic | Schema versioning |
 | Testing | pytest + httpx + pytest-cov | Unit/integration tests |
 
 ---
