@@ -34,16 +34,6 @@ I chose PostgreSQL for this project because it's exceptionally reliable, easy to
 
 SQLite is supported only as a convenience fallback when DATABASE_URL is not configured, mainly for quick local testing. PostgreSQL should be used for normal development and evaluation.
 
-1. **Data Integrity** - Game store requires strict referential integrity (users ↔ orders ↔ products). PostgreSQL's constraint system prevents orphaned records.
-
-2. **JSONB for Metadata** - Product metadata (tags, platforms, requirements) can be stored as JSONB, enabling flexible queries without schema changes.
-
-3. **Concurrency Handling** - Multiple users purchasing simultaneously requires MVCC. PostgreSQL handles concurrent reads/writes without locking.
-
-4. **Geographic Queries** - Location-based product filtering (JO/SA regions) can leverage PostGIS if extended.
-
-5. **Production Readiness** - Battle-tested in e-commerce (Shopify, Spotify). Supports replication, point-in-time recovery, and high availability.
-
 ---
 
 ## Project Structure
@@ -425,38 +415,6 @@ alembic downgrade -1
 
 # Show migration history
 alembic history
-```
-
----
-
-## Building for Production
-
-### Backend
-
-```bash
-cd backend
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run migrations
-alembic upgrade head
-
-# Start with production server
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
-```
-
-### Frontend
-
-```bash
-cd frontend
-
-# Build optimized production bundle
-npm run build
-
-# Start production server
-npm start
 ```
 
 ---
