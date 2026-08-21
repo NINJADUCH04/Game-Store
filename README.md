@@ -5,11 +5,11 @@ A full-stack web application for browsing and purchasing digital games with loca
 ## Architecture
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│    Frontend     │────▶│     Backend     │────▶│    Database     │
-│   (Next.js)     │     │    (FastAPI)    │     │  (PostgreSQL)   │
-│   Port 3001     │◀────│   Port 8000     │◀────│   Port 5433     │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
+┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
+│    Frontend     │────────▶│     Backend     │────────▶│    Database     │
+│    (Next.js)    │         │    (FastAPI)    │         │  (PostgreSQL)   │
+│    Port 3001    │◀────────│    Port 8000    │◀────────│    Port 5433    │
+└─────────────────┘         └─────────────────┘         └─────────────────┘
 ```
 
 ### Tech Stack
