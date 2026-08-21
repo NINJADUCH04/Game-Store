@@ -23,7 +23,7 @@ services:
     environment:
       DATABASE_URL: postgresql://store_user:securepassword@db:5432/game_store
       SECRET_KEY: docker-secret-key-change-in-production
-      CORS_ORIGINS: '["http://localhost:3000","http://localhost:3001"]'
+      CORS_ORIGINS: '["http://localhost:3000"]'
     depends_on:
       db:
         condition: service_healthy
@@ -43,7 +43,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3001:3001"
+      - "3000:3000"
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
     depends_on:

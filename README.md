@@ -8,7 +8,7 @@ A full-stack web application for browsing and purchasing digital games with loca
 ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
 │    Frontend     │────────▶│     Backend     │────────▶│    Database     │
 │    (Next.js)    │         │    (FastAPI)    │         │  (PostgreSQL)   │
-│    Port 3001    │◀────────│    Port 8000    │◀────────│    Port 5433    │
+│    Port 3000    │◀────────│    Port 8000    │◀────────│    Port 5433    │
 └─────────────────┘         └─────────────────┘         └─────────────────┘
 ```
 
@@ -123,7 +123,7 @@ docker compose up --build
 ```
 
 This starts everything:
-- **Frontend**: http://localhost:3001
+- **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Docs**: http://localhost:8000/docs
 - **PostgreSQL**: localhost:5433
@@ -188,7 +188,7 @@ DATABASE_URL=postgresql://store_user:securepassword@localhost:5432/game_store
 SECRET_KEY=super-secret-jwt-key-change-in-production
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
-CORS_ORIGINS=["http://localhost:3000","http://localhost:3001"]
+CORS_ORIGINS=["http://localhost:3000","http://localhost:3000"]
 EOF
 
 # Run migrations
@@ -224,11 +224,11 @@ echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
 npm run dev
 ```
 
-Frontend is now running at http://localhost:3001.
+Frontend is now running at http://localhost:3000.
 
 ### Step 4 — Verify
 
-1. Open http://localhost:3001 in your browser
+1. Open http://localhost:3000 in your browser
 2. You should see the login page
 3. Register a new account, sign in, and browse products
 4. API docs available at http://localhost:8000/docs
@@ -237,9 +237,9 @@ Frontend is now running at http://localhost:3001.
 
 ### Register a New Account
 
-1. Open `http://localhost:3001` in your browser
+1. Open `http://localhost:3000` in your browser
 2. You will be redirected to `/login` (the landing page)
-3. Click **"Sign Up"** or navigate to `http://localhost:3001/register`
+3. Click **"Sign Up"** or navigate to `http://localhost:3000/register`
 4. Fill in the form:
    - **Username**: your desired username
    - **Email**: your email address
@@ -249,7 +249,7 @@ Frontend is now running at http://localhost:3001.
 
 ### Sign In
 
-1. Navigate to `http://localhost:3001/login`
+1. Navigate to `http://localhost:3000/login`
 2. Enter your **username** and **password**
 3. Click **"Sign In"**
 4. You will be redirected to `/products` — the product catalog
@@ -436,7 +436,7 @@ Coverage runs automatically on every `pytest` invocation.
 | `SECRET_KEY` | `super-secret-jwt-key-change-in-production` | JWT signing key — change in production |
 | `ALGORITHM` | `HS256` | JWT algorithm |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `1440` (24 hours) | Token expiry time |
-| `CORS_ORIGINS` | `["http://localhost:3000","http://localhost:3001"]` | Allowed frontend origins |
+| `CORS_ORIGINS` | `["http://localhost:3000","http://localhost:3000"]` | Allowed frontend origins |
 
 ### Frontend (`frontend/.env.local`)
 
@@ -489,7 +489,7 @@ This project was built with a decoupled monorepo architecture designed for clear
 
 | Assumption | Details |
 |------------|---------|
-| **Port Configuration** | Frontend runs on port 3001 and PostgreSQL on port 5433 to avoid conflicts with locally running services (Node.js dev server on 3000, local PostgreSQL on 5432). These can be changed in `docker-compose.yml`. |
+| **Port Configuration** | Frontend runs on port 3000 and PostgreSQL on port 5433 to avoid conflicts with locally running services (local PostgreSQL on 5432). These can be changed in `docker-compose.yml`. |
 | **Database Credentials** | Default credentials (`store_user` / `securepassword`) are hardcoded in `docker-compose.yml` for development convenience. These must be changed for any production deployment. |
 | **JWT Secret** | The default signing key (`super-secret-jwt-key-change-in-production`) is used. This must be replaced with a strong, unique secret in production. |
 | **Valid Regions** | Only `JO` (Jordan) and `SA` (Saudi Arabia) are accepted as valid location filters. Products with other or missing location values are treated as global. |
