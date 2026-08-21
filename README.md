@@ -90,115 +90,26 @@ fs-sde-assignment/
 
 | Requirement | Version | Check |
 |-------------|---------|-------|
-| Node.js | 18+ | `node --version` |
-| npm | 9+ | `npm --version` |
-| Python | 3.10+ | `python3 --version` |
-| PostgreSQL | 15+ | `psql --version` |
+| Docker | 20+ | `docker --version` |
+| Docker Compose | 2.0+ | `docker compose version` |
 
-### Step 1 — Clone the Repository
+### Quick Start
 
 ```bash
 git clone https://github.com/NINJADUCH04/Game-Store.git
 cd Game-Store
-```
-
-### Step 2 — Database Setup
-
-Start PostgreSQL:
-
-```bash
-# Ubuntu/Debian
-sudo systemctl start postgresql
-
-# macOS (Homebrew)
-brew services start postgresql
-
-# Docker
-docker run -d --name gamestore-db -p 5432:5432 -e POSTGRES_USER=store_user -e POSTGRES_PASSWORD=securepassword -e POSTGRES_DB=game_store postgres:15
-```
-
-Then create the database and user:
-
-```sql
-CREATE DATABASE game_store;
-CREATE USER store_user WITH PASSWORD 'securepassword';
-GRANT ALL PRIVILEGES ON DATABASE game_store TO store_user;
-```
-
-Or using the command line:
-
-```bash
-sudo -u postgres psql -c "CREATE DATABASE game_store;"
-sudo -u postgres psql -c "CREATE USER store_user WITH PASSWORD 'securepassword';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE game_store TO store_user;"
-```
-
-### Step 3 — Backend Setup
-
-```bash
-cd backend
-
-# Create and activate virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install production dependencies
-pip install -r requirements.txt
-
-# Install test dependencies
-pip install -r requirements-test.txt
-
-# Configure environment variables
-cp .env.example .env
-
-# Run database migrations
-alembic upgrade head
-
-# Seed the database with product data
-python scripts/import_csv.py
-
-# Start the backend server
-uvicorn app.main:app --reload --port 8000
-```
-
-The API is now running at `http://localhost:8000`.
-
-Interactive documentation is available at:
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-
-### Step 4 — Frontend Setup
-
-Open a **new terminal**:
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
-```
-
-The frontend is now running at `http://localhost:3000`.
-
----
-
-## Docker Setup (Alternative)
-
-Run the entire stack with one command:
-
-```bash
 docker compose up --build
 ```
 
-This starts:
-- **PostgreSQL** on `localhost:5432`
-- **Backend** on `localhost:8000` (runs migrations + seeds data automatically)
-- **Frontend** on `localhost:3000`
+This starts everything:
+- **Frontend**: http://localhost:3001
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
+- **PostgreSQL**: localhost:5433
 
-To stop and remove volumes:
+The backend automatically runs migrations and imports product data on startup.
+
+### Stopping
 
 ```bash
 docker compose down -v
@@ -428,7 +339,26 @@ alembic history
 ```
 
 ---
+## 🏗️ Architecture & Structural Decisions
 
+This project was built with a decoupled monorepo architecture designed for clear separation of concerns, high transaction integrity, and modern developer experience.
+
+### Key Architectural Highlights
+
+1. **Monorepo Layout:**
+   - Unified `frontend/` (Next.js 15 App Router) and `backend/` (FastAPI) under a single root project, enabling coordinated environment setups and streamlined Docker containerization.
+
+2. **Decoupled Stateless Authentication:**
+   - Utilizes OAuth2 with Bearer JWT tokens. The FastAPI backend handles secure password hashing via Bcrypt and stateless token issuance, allowing the Next.js frontend to securely access protected endpoints via Axios request interceptors.
+
+3. **Data Integrity & Snapshot Pattern:**
+   - **PostgreSQL Persistence:** Chosen as the primary production database to enforce strict ACID compliance, foreign key constraints, and concurrent transaction safety during checkout.
+   - **Price & Order Snapshots:** When an order is placed, the backend stores immutable snapshots of `unit_price`, `product_title`, and `buyer_username` inside the `orders` table. This prevents historical receipt distortion if product titles or prices are updated in the catalog later.
+   - **UUID Primary Keys:** Orders utilize `UUIDv4` primary keys to prevent resource enumeration attacks on public receipt URLs (`/receipt/[id]`).
+
+4. **Fallback Database Configuration:**
+   - Configured with SQLAlchemy to automatically fall back to SQLite when `DATABASE_URL` is absent, allowing zero-config local development while maintaining full PostgreSQL functionality in production.
+   
 ## License
 
 This project is an assessment submission.

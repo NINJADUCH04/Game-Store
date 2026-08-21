@@ -12,10 +12,13 @@ def list_products(
     page: int = 1,
     page_size: int = 10,
     location: Optional[str] = None,
+    search: Optional[str] = None,
 ) -> dict:
     query = db.query(Product)
     if location:
         query = query.filter(Product.location == location.upper())
+    if search:
+        query = query.filter(Product.title.ilike(f"%{search}%"))
 
     total = query.count()
     offset = (page - 1) * page_size

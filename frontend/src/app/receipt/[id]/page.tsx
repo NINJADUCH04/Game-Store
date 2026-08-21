@@ -44,18 +44,21 @@ export default function ReceiptPage({ params }: { params: Promise<{ id: string }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0c0f1d] flex flex-col">
+      <div className="min-h-screen bg-cover bg-center bg-fixed flex flex-col" style={{ backgroundImage: "url('/products-wallpaper.jpg')" }}>
+      <div className="min-h-screen bg-slate-950/80 flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center text-cyan-400 font-orbitron text-sm animate-pulse tracking-widest">
+        <div className="flex-1 flex items-center justify-center text-yellow-400 font-orbitron text-sm animate-pulse tracking-widest">
           GENERATING DIGITAL RECEIPT...
         </div>
       </div>
+    </div>
     );
   }
 
   if (error || !order) {
     return (
-      <div className="min-h-screen bg-[#0c0f1d] flex flex-col text-slate-100">
+      <div className="min-h-screen bg-cover bg-center bg-fixed flex flex-col text-slate-100" style={{ backgroundImage: "url('/products-wallpaper.jpg')" }}>
+      <div className="min-h-screen bg-slate-950/80 flex flex-col">
         <Navbar />
         <main className="max-w-xl mx-auto px-4 py-16 flex-1 w-full text-center">
           <div className="bg-slate-900 border border-rose-500/30 rounded-2xl p-8">
@@ -69,6 +72,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ id: string }
           </div>
         </main>
       </div>
+      </div>
     );
   }
 
@@ -77,8 +81,9 @@ export default function ReceiptPage({ params }: { params: Promise<{ id: string }
   const price = typeof order.unit_price === 'number' ? order.unit_price : 0;
 
   return (
-    <div className="min-h-screen bg-[#0c0f1d] text-slate-100 flex flex-col">
-      <Navbar />
+    <div className="min-h-screen bg-cover bg-center bg-fixed text-slate-100 flex flex-col" style={{ backgroundImage: "url('/products-wallpaper.jpg')" }}>
+      <div className="min-h-screen bg-slate-950/80 flex flex-col">
+        <Navbar />
 
       <main className="max-w-xl mx-auto px-4 py-16 flex-1 w-full">
         <div className="bg-slate-900/90 border border-emerald-500/40 rounded-2xl p-8 shadow-2xl relative overflow-hidden backdrop-blur-md">
@@ -104,7 +109,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ id: string }
 
             <div className="flex justify-between items-center pb-3 border-b border-slate-800">
               <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">Player</span>
-              <span className="text-xs font-orbitron text-cyan-400 bg-cyan-950/50 px-2.5 py-1 rounded border border-cyan-500/30">
+              <span className="text-xs font-orbitron text-yellow-400 bg-yellow-950/50 px-2.5 py-1 rounded border border-yellow-500/30">
                 {order.buyer_username || 'Standard License'}
               </span>
             </div>
@@ -125,6 +130,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ id: string }
           </Link>
         </div>
       </main>
+      </div>
     </div>
   );
 }

@@ -17,10 +17,11 @@ def list_products(
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     location: Optional[str] = Query(None, pattern="^(JO|SA)$"),
+    search: Optional[str] = Query(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> dict:
-    return product_service.list_products(db, page, page_size, location)
+    return product_service.list_products(db, page, page_size, location, search)
 
 
 @router.get("/{product_id}", response_model=ProductResponse)

@@ -19,7 +19,6 @@ export default function ProductsPage() {
   const [search, setSearch] = useState('');
   const [location, setLocation] = useState<string>('');
   
-  // Pagination States
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 10;
@@ -30,6 +29,7 @@ export default function ProductsPage() {
       try {
         let url = `/api/products?page=${page}&page_size=${pageSize}`;
         if (location) url += `&location=${location}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
         
         const res = await api.get(url);
         
@@ -47,11 +47,12 @@ export default function ProductsPage() {
       }
     };
     fetchProducts();
-  }, [page, location]);
+  }, [page, location, search]);
 
-  const filteredProducts = products.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   const handleLocationChange = (value: string) => {
     setLocation(value);
@@ -59,12 +60,13 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0c0f1d] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-cover bg-center bg-fixed text-slate-100 flex flex-col" style={{ backgroundImage: "url('/products-wallpaper.jpg')" }}>
+      <div className="min-h-screen bg-slate-950/80 flex flex-col">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
         {/* Banner Section */}
-        <div className="mb-8 p-6 sm:p-8 bg-slate-900/90 rounded-2xl border border-cyan-500/30 shadow-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="mb-8 p-6 sm:p-8 bg-slate-900/90 rounded-2xl border border-purple-500/30 shadow-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative z-10">
             <h1 className="text-3xl font-black font-orbitron text-white tracking-wide mb-2">
               CATALOG & STOREFRONT
@@ -80,8 +82,8 @@ export default function ProductsPage() {
               type="text"
               placeholder="Search by title..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-950 border border-cyan-500/30 text-white placeholder-slate-500 px-4 py-2.5 rounded-xl outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition text-sm"
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full bg-slate-950 border border-purple-500/30 text-white placeholder-slate-500 px-4 py-2.5 rounded-xl outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition text-sm"
             />
           </div>
 
@@ -91,8 +93,8 @@ export default function ProductsPage() {
               onClick={() => handleLocationChange('')}
               className={`font-orbitron text-xs font-bold px-4 py-2 rounded-xl transition uppercase tracking-wider cursor-pointer ${
                 location === ''
-                  ? 'bg-cyan-600 text-white border border-cyan-500'
-                  : 'bg-slate-950 text-slate-400 border border-slate-700 hover:border-cyan-500/50'
+                  ? 'bg-indigo-600 text-white border border-indigo-500'
+                  : 'bg-slate-950 text-slate-400 border border-slate-700 hover:border-purple-500/50'
               }`}
             >
               All
@@ -101,8 +103,8 @@ export default function ProductsPage() {
               onClick={() => handleLocationChange('JO')}
               className={`font-orbitron text-xs font-bold px-4 py-2 rounded-xl transition uppercase tracking-wider cursor-pointer ${
                 location === 'JO'
-                  ? 'bg-cyan-600 text-white border border-cyan-500'
-                  : 'bg-slate-950 text-slate-400 border border-slate-700 hover:border-cyan-500/50'
+                  ? 'bg-indigo-600 text-white border border-indigo-500'
+                  : 'bg-slate-950 text-slate-400 border border-slate-700 hover:border-purple-500/50'
               }`}
             >
               JO
@@ -111,46 +113,51 @@ export default function ProductsPage() {
               onClick={() => handleLocationChange('SA')}
               className={`font-orbitron text-xs font-bold px-4 py-2 rounded-xl transition uppercase tracking-wider cursor-pointer ${
                 location === 'SA'
-                  ? 'bg-cyan-600 text-white border border-cyan-500'
-                  : 'bg-slate-950 text-slate-400 border border-slate-700 hover:border-cyan-500/50'
+                  ? 'bg-indigo-600 text-white border border-indigo-500'
+                  : 'bg-slate-950 text-slate-400 border border-slate-700 hover:border-purple-500/50'
               }`}
             >
               SA
             </button>
           </div>
 
-          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
         </div>
 
         {/* Loading State */}
         {loading ? (
-          <div className="text-center py-24 text-cyan-400 font-orbitron text-lg animate-pulse tracking-widest">
+          <div className="text-center py-24 text-purple-400 font-orbitron text-lg animate-pulse tracking-widest">
             LOADING GAME VAULT...
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className="text-center py-20 bg-slate-900/50 rounded-2xl border border-slate-800">
             <p className="text-slate-400 font-medium">No games found on this page.</p>
           </div>
         ) : (
-          /* Products Grid (10 Items) */
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-              {filteredProducts.map((game) => (
+              {products.map((game) => (
                 <div
                   key={game.id}
-                  className="bg-slate-900/80 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-4 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-cyan-950/40 group relative overflow-hidden"
+                  className="bg-slate-900/80 border border-slate-800 hover:border-purple-500/50 rounded-2xl p-4 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-purple-950/40 group relative overflow-hidden"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] font-orbitron font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-400/30 px-2 py-0.5 rounded uppercase tracking-wider">
+                      <span className={`text-[10px] font-orbitron font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+                        game.location === 'JO'
+                          ? 'text-cyan-400 bg-cyan-400/10 border border-cyan-400/30'
+                          : game.location === 'SA'
+                          ? 'text-amber-400 bg-amber-400/10 border border-amber-400/30'
+                          : 'text-yellow-400 bg-yellow-400/10 border border-yellow-400/30'
+                      }`}>
                         {game.location || 'GLOBAL'}
                       </span>
-                      <span className="text-lg font-black font-orbitron text-cyan-400">
+                      <span className="text-lg font-black font-orbitron text-yellow-400">
                         ${game.price.toFixed(2)}
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-white mb-2 line-clamp-1 font-orbitron group-hover:text-cyan-300 transition">
+                    <h3 className="text-base font-bold text-white mb-2 line-clamp-1 font-orbitron group-hover:text-purple-300 transition">
                       {game.title}
                     </h3>
 
@@ -159,13 +166,12 @@ export default function ProductsPage() {
                     </p>
                   </div>
 
-              
-<Link
-  href={`/products/${game.id}`}  // <-- Change from /buy/${game.id} to /products/${game.id}
-  className="w-full text-center bg-cyan-600 hover:bg-cyan-500 text-white font-orbitron text-xs font-bold py-2.5 rounded-xl transition uppercase tracking-wider block shadow-md shadow-cyan-950/50 cursor-pointer"
->
-  View Details
-</Link>
+                  <Link
+                    href={`/products/${game.id}`}
+                    className="w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white font-orbitron text-xs font-bold py-2.5 rounded-xl transition uppercase tracking-wider block shadow-md shadow-purple-950/50 cursor-pointer"
+                  >
+                    View Details
+                  </Link>
                 </div>
               ))}
             </div>
@@ -175,19 +181,19 @@ export default function ProductsPage() {
               <button
                 onClick={() => setPage((p) => Math.max(p - 1, 1))}
                 disabled={page === 1}
-                className="font-orbitron text-xs font-bold px-4 py-2 rounded-lg bg-slate-900 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-950/50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="font-orbitron text-xs font-bold px-4 py-2 rounded-lg bg-slate-900 border border-purple-500/30 text-purple-400 hover:bg-purple-950/50 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 ← PREV
               </button>
 
               <span className="font-orbitron text-xs text-slate-400">
-                PAGE <strong className="text-cyan-400">{page}</strong> OF <strong className="text-white">{totalPages}</strong>
+                PAGE <strong className="text-purple-400">{page}</strong> OF <strong className="text-white">{totalPages}</strong>
               </span>
 
               <button
                 onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                 disabled={page >= totalPages}
-                className="font-orbitron text-xs font-bold px-4 py-2 rounded-lg bg-slate-900 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-950/50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="font-orbitron text-xs font-bold px-4 py-2 rounded-lg bg-slate-900 border border-purple-500/30 text-purple-400 hover:bg-purple-950/50 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 NEXT →
               </button>
@@ -195,6 +201,7 @@ export default function ProductsPage() {
           </>
         )}
       </main>
+      </div>
     </div>
   );
 }
