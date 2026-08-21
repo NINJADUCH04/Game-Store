@@ -145,9 +145,9 @@ export default function ProductsPage() {
                     <div className="flex items-center justify-between mb-3">
                       <span className={`text-[10px] font-orbitron font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
                         game.location === 'JO'
-                          ? 'text-cyan-400 bg-cyan-400/10 border border-cyan-400/30'
+                          ? 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/30'
                           : game.location === 'SA'
-                          ? 'text-amber-400 bg-amber-400/10 border border-amber-400/30'
+                          ? 'text-rose-400 bg-rose-400/10 border border-rose-400/30'
                           : 'text-yellow-400 bg-yellow-400/10 border border-yellow-400/30'
                       }`}>
                         {game.location || 'GLOBAL'}

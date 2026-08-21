@@ -19,7 +19,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <button 
               onClick={logout} 
-              className="font-orbitron text-xs font-semibold text-rose-400 hover:text-rose-300 transition uppercase tracking-wider bg-rose-950/40 border border-rose-500/30 px-3 py-1.5 rounded cursor-pointer"
+              className="font-orbitron text-xs font-semibold text-white hover:text-slate-300 transition uppercase tracking-wider bg-slate-700/40 border border-slate-500/30 px-3 py-1.5 rounded cursor-pointer"
             >
               Logout
             </button>

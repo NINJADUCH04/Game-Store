@@ -8,7 +8,7 @@ A full-stack web application for browsing and purchasing digital games with loca
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │    Frontend     │────▶│     Backend     │────▶│    Database     │
 │   (Next.js)     │     │    (FastAPI)    │     │  (PostgreSQL)   │
-│   Port 3000     │     │   Port 8000     │     │   Port 5432     │
+│   Port 3001     │     │   Port 8000     │     │   Port 5433     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
@@ -86,14 +86,14 @@ fs-sde-assignment/
 
 ## Getting Started
 
-### Prerequisites
+### Prerequisites (Docker)
 
 | Requirement | Version | Check |
 |-------------|---------|-------|
 | Docker | 20+ | `docker --version` |
 | Docker Compose | 2.0+ | `docker compose version` |
 
-### Quick Start
+### Quick Start (Docker)
 
 ```bash
 git clone https://github.com/NINJADUCH04/Game-Store.git
@@ -109,31 +109,129 @@ This starts everything:
 
 The backend automatically runs migrations and imports product data on startup.
 
-### Stopping
+### Stopping (Docker)
 
 ```bash
 docker compose down -v
 ```
 
+---
+
+## Manual Setup (Without Docker)
+
+Use this if Docker is unavailable or you prefer to run services natively.
+
+### Prerequisites
+
+| Requirement | Version | Check |
+|-------------|---------|-------|
+| Python | 3.12+ | `python3 --version` |
+| Node.js | 20.9+ | `node --version` |
+| PostgreSQL | 15+ | `psql --version` |
+
+### Credentials
+
+All credentials are listed here for reference. Use these exact values during setup:
+
+| Service | Username | Password | Database |
+|---------|----------|----------|----------|
+| PostgreSQL | `store_user` | `securepassword` | `game_store` |
+| JWT Secret | — | `super-secret-jwt-key-change-in-production` | — |
+
+### Step 1 — Database
+
+Start PostgreSQL and create the database and user:
+
+```bash
+sudo -u postgres psql -c "CREATE DATABASE game_store;"
+sudo -u postgres psql -c "CREATE USER store_user WITH PASSWORD 'securepassword';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE game_store TO store_user;"
+sudo -u postgres psql -c "ALTER DATABASE game_store OWNER TO store_user;"
+```
+
+### Step 2 — Backend
+
+```bash
+cd backend
+
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+pip install -r requirements-test.txt
+
+# Create .env file with required variables
+cat > .env << 'EOF'
+DATABASE_URL=postgresql://store_user:securepassword@localhost:5432/game_store
+SECRET_KEY=super-secret-jwt-key-change-in-production
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+CORS_ORIGINS=["http://localhost:3000","http://localhost:3001"]
+EOF
+
+# Run migrations
+alembic upgrade head
+
+# Import product data from CSV
+python scripts/import_csv.py
+
+# Start the backend server
+uvicorn app.main:app --reload --port 8000
+```
+
+Backend is now running at http://localhost:8000. Verify with:
+
+```bash
+curl http://localhost:8000/health
+```
+
+### Step 3 — Frontend
+
+Open a new terminal:
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Create .env.local
+echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
+
+# Start the development server
+npm run dev
+```
+
+Frontend is now running at http://localhost:3001.
+
+### Step 4 — Verify
+
+1. Open http://localhost:3001 in your browser
+2. You should see the login page
+3. Register a new account, sign in, and browse products
+4. API docs available at http://localhost:8000/docs
+
 ## Using the Application
 
 ### Register a New Account
 
-1. Open `http://localhost:3000` in your browser
-2. You will be redirected to `/products`, then to `/login` (since you're not authenticated)
-3. Click **"Register"** or navigate to `http://localhost:3000/register`
+1. Open `http://localhost:3001` in your browser
+2. You will be redirected to `/login` (the landing page)
+3. Click **"Sign Up"** or navigate to `http://localhost:3001/register`
 4. Fill in the form:
    - **Username**: your desired username
    - **Email**: your email address
    - **Password**: your password
-5. Click **"Register"**
+5. Click **"Sign Up"**
 6. You will be redirected to `/login`
 
 ### Sign In
 
-1. Navigate to `http://localhost:3000/login`
+1. Navigate to `http://localhost:3001/login`
 2. Enter your **username** and **password**
-3. Click **"Login"**
+3. Click **"Sign In"**
 4. You will be redirected to `/products` — the product catalog
 5. Your JWT token is stored in `localStorage` and attached to all API requests automatically
 
@@ -310,7 +408,7 @@ Coverage runs automatically on every `pytest` invocation.
 | `SECRET_KEY` | `super-secret-jwt-key-change-in-production` | JWT signing key — change in production |
 | `ALGORITHM` | `HS256` | JWT algorithm |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `1440` (24 hours) | Token expiry time |
-| `CORS_ORIGINS` | `["http://localhost:3000"]` | Allowed frontend origins |
+| `CORS_ORIGINS` | `["http://localhost:3000","http://localhost:3001"]` | Allowed frontend origins |
 
 ### Frontend (`frontend/.env.local`)
 
@@ -359,6 +457,29 @@ This project was built with a decoupled monorepo architecture designed for clear
 4. **Fallback Database Configuration:**
    - Configured with SQLAlchemy to automatically fall back to SQLite when `DATABASE_URL` is absent, allowing zero-config local development while maintaining full PostgreSQL functionality in production.
    
+## Assumptions
+
+| Assumption | Details |
+|------------|---------|
+| **Port Configuration** | Frontend runs on port 3001 and PostgreSQL on port 5433 to avoid conflicts with locally running services (Node.js dev server on 3000, local PostgreSQL on 5432). These can be changed in `docker-compose.yml`. |
+| **Database Credentials** | Default credentials (`store_user` / `securepassword`) are hardcoded in `docker-compose.yml` for development convenience. These must be changed for any production deployment. |
+| **JWT Secret** | The default signing key (`super-secret-jwt-key-change-in-production`) is used. This must be replaced with a strong, unique secret in production. |
+| **Valid Regions** | Only `JO` (Jordan) and `SA` (Saudi Arabia) are accepted as valid location filters. Products with other or missing location values are treated as global. |
+| **Pagination** | The default page size is 10 items per page across all list endpoints (max 100). |
+| **Static Assets** | The frontend expects `wallpaperPurple.gif` and `products-wallpaper.jpg` to exist in `frontend/public/`. Missing assets will result in a plain background. |
+| **SQLite** | Used exclusively for the test suite via dependency override. Never used for development or production — PostgreSQL is always required for normal operation. |
+| **Data Import** | In Docker, `data.csv` is imported into PostgreSQL automatically on startup via the backend entrypoint. For manual setup (without Docker), run `python scripts/import_csv.py` from the `backend/` directory after migrations. The CSV must contain `title`, `description`, `price`, and `location` columns. |
+| **Purchase Flow** | Purchases are assumed to succeed immediately. There is no payment gateway integration — clicking "Buy Now" creates the order and records the transaction directly. |
+
+---
+## 🔮 Future Roadmap & Enterprise Architecture
+
+To support high-concurrency payment processing, automated billing, and telemetry, the platform architecture will evolve across four core tracks:
+
+* **Payment Infrastructure:** Direct payment gateway integration (Stripe/Adyen) featuring 3D Secure 2.0 (3DS2) authentication, PCI-DSS Level 1 tokenization, and direct issuer authorization flows.
+* **Recurring Billing Engine:** Automated recurring billing for gaming passes that automatically retries failed payments, sends customer reminders, and processes instant payment status updates via webhooks.
+* **Event-Driven Notifications:** Real-time multi-channel dispatch (WebSockets, AWS SES, Firebase) powered by Redis/Celery for price drops, fulfillment receipts, and restock alerts.
+* **Orchestration & Observability:** Deployment onto auto-scaling Kubernetes (k8s) pods with enterprise APM integration (**Dynatrace**) for OpenTelemetry distributed tracing and real-time transaction profiling during peak traffic.
 ## License
 
 This project is an assessment submission.
