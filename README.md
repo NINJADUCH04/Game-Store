@@ -39,7 +39,7 @@ SQLite is supported only as a convenience fallback when DATABASE_URL is not conf
 ## Project Structure
 
 ```
-fs-sde-assignment/
+Game-Store/
 ├── backend/
 │   ├── app/
 │   │   ├── core/
