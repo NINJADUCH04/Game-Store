@@ -24,3 +24,4 @@ dist/
 .vscode/
 .idea/backend/.coverage
 frontend/public/tabIcon.jpeg
+backend/.coverage

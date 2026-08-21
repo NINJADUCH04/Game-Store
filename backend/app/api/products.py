@@ -8,7 +8,7 @@ from app.db.database import get_db
 from app.db.models import User
 from app.core.schemas import ProductResponse, PaginatedProductsResponse
 from app.core.auth import get_current_user
-from app.db import product_service
+from app.services import product_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/products", tags=["Products"])

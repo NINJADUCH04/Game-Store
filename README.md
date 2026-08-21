@@ -43,21 +43,23 @@ fs-sde-assignment/
 ├── backend/
 │   ├── app/
 │   │   ├── core/
-│   │   │   ├── auth.py          # JWT creation/validation, password hashing
-│   │   │   ├── config.py        # Pydantic BaseSettings (env vars)
-│   │   │   ├── database.py      # SQLAlchemy engine, session, get_db
-│   │   │   ├── models.py        # ORM models: User, Product, Order
-│   │   │   └── schemas.py       # Pydantic request/response schemas
-│   │   ├── routers/
-│   │   │   ├── auth.py          # POST /api/auth/register, /api/auth/login
-│   │   │   ├── products.py      # GET /api/products, GET /api/products/{id}
-│   │   │   └── orders.py        # POST /api/orders, GET /api/orders/{id}
+│   │   │   ├── auth.py              # JWT creation/validation, password hashing
+│   │   │   ├── auth_service.py      # Registration + authentication logic
+│   │   │   ├── config.py            # Pydantic BaseSettings (env vars)
+│   │   │   ├── logging_config.py    # Structured logging setup
+│   │   │   └── schemas.py           # Pydantic request/response schemas
+│   │   ├── api/
+│   │   │   ├── auth.py              # POST /api/auth/register, /api/auth/login
+│   │   │   ├── products.py          # GET /api/products, GET /api/products/{id}
+│   │   │   └── orders.py            # POST /api/orders, GET /api/orders/{id}
 │   │   ├── services/
-│   │   │   ├── auth_service.py  # Registration + authentication logic
-│   │   │   ├── product_service.py # Product listing + retrieval logic
-│   │   │   └── order_service.py # Order creation + retrieval logic
-│   │   └── main.py              # FastAPI app, CORS, routers, health check
-│   ├── alembic/                 # Database migration scripts
+│   │   │   ├── order_service.py     # Order creation + retrieval logic
+│   │   │   └── product_service.py   # Product listing + retrieval logic
+│   │   ├── db/
+│   │   │   ├── database.py          # SQLAlchemy engine, session, get_db
+│   │   │   └── models.py            # ORM models: User, Product, Order
+│   │   └── main.py                  # FastAPI app, CORS, routers, health check
+│   ├── alembic/                     # Database migration scripts
 │   ├── tests/
 │  
 ├── frontend/
