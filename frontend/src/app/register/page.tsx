@@ -36,14 +36,16 @@ export default function RegisterPage() {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen w-screen m-0 p-4 flex items-center justify-center bg-cover bg-center bg-no-repeat fixed inset-0 overflow-y-auto"
       style={{ backgroundImage: "url('/wallpaper.jpg')" }}
     >
       <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-xs" />
 
       <div className="relative z-10 w-full max-w-md p-6 bg-slate-900/90 rounded-lg shadow-xl border border-purple-900/50 my-auto">
-        <h2 className="text-2xl font-bold mb-2 text-center text-white">Create Account</h2>
+        <h1 className="font-black font-orbitron text-2xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-yellow-400 tracking-wider text-center mb-2">
+          GameStore
+        </h1>
         <p className="text-sm text-indigo-300 text-center mb-6">
           Sign up to start purchasing digital games
         </p>
