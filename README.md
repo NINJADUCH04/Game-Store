@@ -106,6 +106,14 @@ Or run all Docker commands with `sudo`:
 sudo docker compose up --build
 ```
 
+**Docker DNS Error:** If you see `could not translate host name "db" to address`, prune stale networks and rebuild:
+
+```bash
+docker network prune -f
+docker compose down -v
+docker compose up --build
+```
+
 ### Quick Start (Docker)
 
 ```bash
