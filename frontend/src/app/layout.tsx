@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
 import { AuthProvider } from '@/context/AuthContext';
-import '@/app/globals.css'; // Adjust path if your CSS is elsewhere
+import '@/app/globals.css';
 
 export const metadata: Metadata = {
   title: 'GameStore',
   description: 'Digital Game Store',
+  icons: {
+    icon: '/tabIcon-removebg-preview.png',
+  },
 };
 
 export default function RootLayout({

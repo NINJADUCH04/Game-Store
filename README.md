@@ -8,7 +8,7 @@ A full-stack web application for browsing and purchasing digital games with loca
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │    Frontend     │────▶│     Backend     │────▶│    Database     │
 │   (Next.js)     │     │    (FastAPI)    │     │  (PostgreSQL)   │
-│   Port 3001     │     │   Port 8000     │     │   Port 5433     │
+│   Port 3001     │◀────│   Port 8000     │◀────│   Port 5433     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
@@ -328,12 +328,20 @@ All protected endpoints (Products, Orders) require the `Authorization: Bearer <t
 
 ### Test Setup
 
-Tests use an **in-memory SQLite database** — no PostgreSQL connection needed. The test suite:
+Tests use a **PostgreSQL test database** (`game_store_test`) — the same engine as production. The test suite:
 
 - Creates a fresh database schema before each test
 - Tears down after each test for isolation
 - Overrides the `get_db` dependency to use the test database
 - Provides fixtures for authenticated users, products, and orders
+
+**Prerequisite:** Create the test database before running tests:
+
+```bash
+sudo -u postgres createdb game_store_test
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE game_store_test TO store_user;"
+sudo -u postgres psql -c "ALTER DATABASE game_store_test OWNER TO store_user;"
+```
 
 ### Running Tests
 
@@ -475,8 +483,8 @@ This project was built with a decoupled monorepo architecture designed for clear
    - **Price & Order Snapshots:** When an order is placed, the backend stores immutable snapshots of `unit_price`, `product_title`, and `buyer_username` inside the `orders` table. This prevents historical receipt distortion if product titles or prices are updated in the catalog later.
    - **UUID Primary Keys:** Orders utilize `UUIDv4` primary keys to prevent resource enumeration attacks on public receipt URLs (`/receipt/[id]`).
 
-4. **Fallback Database Configuration:**
-   - Configured with SQLAlchemy to automatically fall back to SQLite when `DATABASE_URL` is absent, allowing zero-config local development while maintaining full PostgreSQL functionality in production.
+4. **PostgreSQL for All Environments:**
+   - Both development and tests run against PostgreSQL. Tests use a dedicated `game_store_test` database to ensure production parity.
    
 ## Assumptions
 
@@ -488,7 +496,7 @@ This project was built with a decoupled monorepo architecture designed for clear
 | **Valid Regions** | Only `JO` (Jordan) and `SA` (Saudi Arabia) are accepted as valid location filters. Products with other or missing location values are treated as global. |
 | **Pagination** | The default page size is 10 items per page across all list endpoints (max 100). |
 | **Static Assets** | The frontend expects `wallpaperPurple.gif` and `products-wallpaper.jpg` to exist in `frontend/public/`. Missing assets will result in a plain background. |
-| **SQLite** | Used exclusively for the test suite via dependency override. Never used for development or production — PostgreSQL is always required for normal operation. |
+| **Test Database** | Tests use a dedicated PostgreSQL database (`game_store_test`) instead of SQLite. Run the prerequisite commands above before running tests. |
 | **Data Import** | In Docker, `data.csv` is imported into PostgreSQL automatically on startup via the backend entrypoint. For manual setup (without Docker), run `python scripts/import_csv.py` from the `backend/` directory after migrations. The CSV must contain `title`, `description`, `price`, and `location` columns. |
 | **Purchase Flow** | Purchases are assumed to succeed immediately. There is no payment gateway integration — clicking "Buy Now" creates the order and records the transaction directly. |
 

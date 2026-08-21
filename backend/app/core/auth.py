@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -12,6 +13,8 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.models import User
 from app.core.schemas import TokenData
+
+logger = logging.getLogger(__name__)
 
 password_hash = PasswordHash((BcryptHasher(),))
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -49,12 +52,16 @@ def get_current_user(
         )
         username: str = payload.get("sub")
         if username is None:
+            logger.warning("Token validation failed: missing 'sub' claim")
             raise credentials_exception
         token_data = TokenData(username=username)
-    except JWTError:
+    except JWTError as e:
+        logger.warning(f"Token validation failed: {e}")
         raise credentials_exception
 
     user = db.query(User).filter(User.username == token_data.username).first()
     if user is None:
+        logger.warning(f"Token validation failed: user '{token_data.username}' not found")
         raise credentials_exception
+    logger.debug(f"Token validated for user '{token_data.username}'")
     return user
