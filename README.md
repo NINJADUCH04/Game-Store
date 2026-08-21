@@ -123,7 +123,20 @@ cd Game-Store
 
 ### Step 2 — Database Setup
 
-Open a PostgreSQL shell and run:
+Start PostgreSQL:
+
+```bash
+# Ubuntu/Debian
+sudo systemctl start postgresql
+
+# macOS (Homebrew)
+brew services start postgresql
+
+# Docker
+docker run -d --name gamestore-db -p 5432:5432 -e POSTGRES_USER=store_user -e POSTGRES_PASSWORD=securepassword -e POSTGRES_DB=game_store postgres:15
+```
+
+Then create the database and user:
 
 ```sql
 CREATE DATABASE game_store;
