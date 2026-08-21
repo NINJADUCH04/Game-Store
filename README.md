@@ -93,6 +93,19 @@ fs-sde-assignment/
 | Docker | 20+ | `docker --version` |
 | Docker Compose | 2.0+ | `docker compose version` |
 
+**Docker Permissions (Linux):** If you get `permission denied while trying to connect to the docker API`, run:
+
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+Or run all Docker commands with `sudo`:
+
+```bash
+sudo docker compose up --build
+```
+
 ### Quick Start (Docker)
 
 ```bash
