@@ -39,8 +39,8 @@ function LoginForm() {
   };
 
   return (
-    <div className="relative z-10 w-full max-w-md p-6 bg-slate-900/90 rounded-lg shadow-xl border border-purple-900/50 my-auto">
-      <h1 className="font-black font-orbitron text-2xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-yellow-400 tracking-wider text-center mb-6">
+      <div className="relative z-10 w-full max-w-md p-8 pt-12 bg-slate-900/90 rounded-lg shadow-xl border border-purple-900/50 my-auto">
+      <h1 className="font-black font-orbitron text-4xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-yellow-400 tracking-wider text-center mb-8">
         GameStore
       </h1>
       <h2 className="text-xl font-bold mb-6 text-center text-white">Sign In</h2>
