@@ -194,6 +194,25 @@ The frontend is now running at `http://localhost:3000`.
 
 ---
 
+## Docker Setup (Alternative)
+
+Run the entire stack with one command:
+
+```bash
+docker compose up --build
+```
+
+This starts:
+- **PostgreSQL** on `localhost:5432`
+- **Backend** on `localhost:8000` (runs migrations + seeds data automatically)
+- **Frontend** on `localhost:3000`
+
+To stop and remove volumes:
+
+```bash
+docker compose down -v
+```
+
 ## Using the Application
 
 ### Register a New Account
