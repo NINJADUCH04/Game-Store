@@ -8,7 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import settings
 from app.core.logging_config import setup_logging
-from app.routers import auth, products, orders
+from app.api import auth, products, orders
 
 logger = logging.getLogger(__name__)
 

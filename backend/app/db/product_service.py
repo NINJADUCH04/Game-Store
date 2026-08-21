@@ -5,7 +5,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.models import Product
+from app.db.models import Product
 
 logger = logging.getLogger(__name__)
 

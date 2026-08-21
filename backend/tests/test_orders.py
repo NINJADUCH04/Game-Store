@@ -60,7 +60,7 @@ class TestGetOrder:
         assert "Order not found" in response.json()["detail"]
 
     def test_get_order_wrong_user(self, client, auth_headers, test_product, db_session):
-        from app.core.models import User
+        from app.db.models import User
         from app.core.auth import get_password_hash, create_access_token
 
         other_user = User(

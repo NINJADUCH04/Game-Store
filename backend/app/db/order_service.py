@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.models import Product, Order, User
+from app.db.models import Product, Order, User
 from app.core.schemas import OrderCreate
 
 logger = logging.getLogger(__name__)

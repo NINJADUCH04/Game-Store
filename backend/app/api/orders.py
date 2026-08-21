@@ -3,11 +3,11 @@ import logging
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
-from app.core.models import User
+from app.db.database import get_db
+from app.db.models import User
 from app.core.schemas import OrderCreate, OrderResponse
 from app.core.auth import get_current_user
-from app.services import order_service
+from app.db import order_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/orders", tags=["Orders"])

@@ -10,8 +10,8 @@ from pwdlib.hashers.bcrypt import BcryptHasher
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.database import get_db
-from app.core.models import User
+from app.db.database import get_db
+from app.db.models import User
 from app.core.schemas import TokenData
 
 logger = logging.getLogger(__name__)
